@@ -1,0 +1,12 @@
+## Interface: 80100
+## Title: DetailsHorizon
+## Notes: Horizontal display of Details data.
+## Version: 0.0.1
+## Author: Exac
+## OptionalDeps: Ace3
+## SavedVariables: DetailsHorizonDB
+## SavedVariablesPerCharacter: DetailsHorizonPerCharDB
+
+embeds.xml
+
+DetailsHorizon.lua
