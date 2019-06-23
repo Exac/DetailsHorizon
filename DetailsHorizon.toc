@@ -1,7 +1,7 @@
 ## Interface: 80100
 ## Title: DetailsHorizon
 ## Notes: Horizontal display of Details data.
-## Version: 0.0.2
+## Version: 0.0.3
 ## Author: Exac
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, Details! Damage Meter
 ## SavedVariables: DetailsHorizonDB
