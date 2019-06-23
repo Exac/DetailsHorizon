@@ -79,7 +79,8 @@ local defaults = {
         switches = {
             isRelative = true,
             isTextUsingClassColor = true,
-            isVerbose = false
+            isVerbose = false,
+            isShowPlayerRealmName = false,
         },
         presets = {
             selected = "avalance"
@@ -523,7 +524,11 @@ function DetailsHorizon:GenerateData()
         -- Filter out non-grouped players and NPCs.
         if (actor:IsPlayer() and actor:IsGroupPlayer()) then
             local player = {}
-            player.name = actor:name()
+            if self.db.profile.switches.isShowPlayerRealmName then
+                player.name = actor:name()
+            else
+                player.name = actor:GetOnlyName()
+            end
             if type(actor.total)=="number" then
                 player.total = actor.total
             else
@@ -679,6 +684,18 @@ function DetailsHorizon:GetConfigOptions()
                         end,
                         set = function (info, value) 
                             self.db.profile.switches.isRelative = value
+                        end,
+                    },
+                    isShowPlayerRealmName = {
+                        name = "Show player's realms",
+                        desc = "Show player's realms in cross-realm groups.\nEG: Exac - Bleeding Hollow vs Exac",
+                        order = 42,
+                        type = "toggle",
+                        get = function (value)
+                            return self.db.profile.switches.isShowPlayerRealmName
+                        end,
+                        set = function (info, value) 
+                            self.db.profile.switches.isShowPlayerRealmName = value
                         end,
                     },
                     countHeader = {
