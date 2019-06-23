@@ -145,7 +145,7 @@ function DetailsHorizon:SetupChildFrames()
         -- Create label
         local childFrameText = childFrame:CreateFontString("childFrameString" .. i, "OVERLAY")
         childFrame.text = childFrameText
-        childFrame.text:SetFont(self.db.profile.bars.text.font, self.db.profile.bars.text.size, self.db.profile.bars.text.style) -- font required
+        childFrame.text:SetFont(LibSharedMedia:Fetch("font", self.db.profile.bars.text.font), self.db.profile.bars.text.size, self.db.profile.bars.text.style) -- font required
 
         -- Add frame to parent's children
         table.insert(frameParent.children, childFrame)
@@ -257,7 +257,7 @@ function DetailsHorizon:StyleChildFrames()
         local text = DetailsHorizon:FormatLabel(fmt, "Unit", "total", "totalPerSecond")
         if self.db.profile.bars.text.truncate then c.text:SetWidth(width) else c.text:SetWidth(0) end
         c.text:SetHeight(fontSize)
-        c.text:SetFont(font, fontSize, fontStyle)
+        c.text:SetFont(LibSharedMedia:Fetch("font", font), fontSize, fontStyle)
         c.text:SetShadowOffset(fontShadow, -1 * fontShadow)
         c.text:SetTextColor(fontRed, fontGreen, fontBlue, fontAlpha)
         c.text:SetText(text)
@@ -965,20 +965,21 @@ function DetailsHorizon:GetConfigOptions()
                         name = "Font",
                         desc = "Font of player's bar",
                         type = "select",
-                        values = function ()
-                            local hashTable = LibSharedMedia:HashTable("font")
-                            local invertedHastTable = {}
-                            for k,v in pairs(hashTable) do
-                                invertedHastTable[v]=k
-                            end
-                            return invertedHastTable
-                        end,
+                        values = LibSharedMedia:List("font"),
                         set = function(info, value)
-                            self.db.profile.bars.text.font = value
+                            self.db.profile.bars.text.font = LibSharedMedia:List("font")[value]
+                            console.log("setting font to "..LibSharedMedia:List("font")[value])
                             DetailsHorizon:StyleChildFrames()
                         end,
                         get = function(value)
-                            return self.db.profile.bars.text.font
+                            local fname = self.db.profile.bars.text.font
+                            for i, v in ipairs(LibSharedMedia:List("font")) do
+                                if fname == v then
+                                    console.log("get() fname="..self.db.profile.bars.text.font..", v="..v..", i="..i)
+                                    return i
+                                end
+                            end
+                            return 0 -- Failed to find an index for the stored name
                         end,
                     },
                     labelFontStyle = {
@@ -1318,7 +1319,7 @@ function DetailsHorizon:GetConfigOptions()
                                 self.db.profile.bars.text.color.blue = 0
                                 self.db.profile.bars.text.innerPadding = 1
                                 self.db.profile.bars.text.size = 14
-                                self.db.profile.bars.text.font = "Interface\\AddOns\\Details\\Fonts\\Oswald-Regular.otf"
+                                self.db.profile.bars.text.font = "Oswald Regular"
                                 self.db.profile.bars.text.style = ""
                                 self.db.profile.bars.text.shadow = 0
                                 self.db.profile.bars.text.justifyH = "CENTER"
@@ -1348,7 +1349,7 @@ function DetailsHorizon:GetConfigOptions()
                                 self.db.profile.bars.text.color.blue = 0.98
                                 self.db.profile.bars.text.innerPadding = 1
                                 self.db.profile.bars.text.size = 14
-                                self.db.profile.bars.text.font = "Interface\\AddOns\\DetailsHorizon\\Media\\Fonts\\FiraMono-Medium.ttf"
+                                self.db.profile.bars.text.font = "Fira Mono Medium"
                                 self.db.profile.bars.text.style = ""
                                 self.db.profile.bars.text.shadow = 0
                                 self.db.profile.bars.text.justifyH = "CENTER"
@@ -1378,7 +1379,7 @@ function DetailsHorizon:GetConfigOptions()
                                 self.db.profile.bars.text.color.blue = 0.95
                                 self.db.profile.bars.text.innerPadding = 1
                                 self.db.profile.bars.text.size = 16
-                                self.db.profile.bars.text.font = "Interface\\AddOns\\DetailsHorizon\\Media\\Fonts\\FiraMono-Medium.ttf"
+                                self.db.profile.bars.text.font = "Fira Mono Medium"
                                 self.db.profile.bars.text.style = ""
                                 self.db.profile.bars.text.shadow = 0
                                 self.db.profile.bars.text.justifyH = "CENTER"
@@ -1407,7 +1408,7 @@ function DetailsHorizon:GetConfigOptions()
                                 self.db.profile.bars.text.color.blue = 0.95
                                 self.db.profile.bars.text.innerPadding = 3
                                 self.db.profile.bars.text.size = 12
-                                self.db.profile.bars.text.font = "Fonts\\ARIALN.ttf"
+                                self.db.profile.bars.text.font = "Arial Narrow"
                                 self.db.profile.bars.text.style = ""
                                 self.db.profile.bars.text.shadow = 1
                                 self.db.profile.bars.text.justifyH = "LEFT"
@@ -1439,7 +1440,7 @@ function DetailsHorizon:GetConfigOptions()
                                 self.db.profile.bars.text.color.blue = 1
                                 self.db.profile.bars.text.innerPadding = 3
                                 self.db.profile.bars.text.size = 12
-                                self.db.profile.bars.text.font = "Interface\\AddOns\\Details\\Fonts\\Oswald-Regular.otf"
+                                self.db.profile.bars.text.font = "Oswald Regular"
                                 self.db.profile.bars.text.style = ""
                                 self.db.profile.bars.text.shadow = 1
                                 self.db.profile.bars.text.justifyH = "CENTER"
@@ -1471,7 +1472,7 @@ function DetailsHorizon:GetConfigOptions()
                                 self.db.profile.bars.text.color.blue = 1
                                 self.db.profile.bars.text.innerPadding = 16
                                 self.db.profile.bars.text.size = 22 -- Multiple of 11
-                                self.db.profile.bars.text.font = "Interface\\AddOns\\Details\\Fonts\\FORCED SQUARE.ttf"
+                                self.db.profile.bars.text.font = "FORCED SQUARE"
                                 self.db.profile.bars.text.style = "OUTLINE, MONOCHROME"
                                 self.db.profile.bars.text.shadow = 1
                                 self.db.profile.bars.text.justifyH = "LEFT"
@@ -1510,6 +1511,9 @@ function DetailsHorizon:OnInitialize()
     self.profilesFrame = AceConfigDialog:AddToBlizOptions("DetailsHorizon", "DetailsHorizon");
 
     console.log("OnInitialize()")
+
+    -- Registered custom media included with this addon.
+    LibSharedMedia:Register("font", "Fira Mono Medium", "Interface\\AddOns\\DetailsHorizon\\Media\\Fonts\\FiraMono-Medium.ttf", LibSharedMedia.LOCALE_BIT_western + LibSharedMedia.LOCALE_BIT_ruRU)
 
     -- Create the parent frame only once. This has the side-effect of creating
     -- the child-frames too. Style the parent & child frames next.
