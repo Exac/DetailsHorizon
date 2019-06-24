@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2019-06-24
+### Fixed
+- ElvUI changes the global UI scale in an invasive way to get pixel-perfect frames. Added code to prevent ElvUI from resizing the width of DetailsHorison's main background frame.
+- Fix dependencies (Details is named "Details", not "Details! Damage Meter).
+
 ## [0.0.3] - 2019-06-23
 ### Added
 - FiraCode-Medium font and license
