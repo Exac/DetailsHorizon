@@ -117,7 +117,6 @@ end
 -- function can be run MORE THAN ONCE, to add more
 -- child frames.
 function DetailsHorizon:SetupChildFrames()
-    console.log("SetupChildFrames()")
     -- Check if children exist yet
     if not frameParent.children then frameParent.children = {} end
 
@@ -153,8 +152,6 @@ function DetailsHorizon:SetupChildFrames()
         -- Display frame
         childFrame:Show()
     end
-
-    console.log("SetupChildFrames() Added "..createChildCount.." unstyled frames to frameparent.children.")
 end
 
 -- Only create the UI elements for frameParent. This should
@@ -173,13 +170,10 @@ function DetailsHorizon:SetupParentFrame()
 
     -- If the scale ever changes, resize the frame then
     DetailsHorizon:RegisterEvent("UI_SCALE_CHANGED", function () DetailsHorizon:OnFrameResize() end)
-
-    console.log("SetupParentFrame() Created unstyled frameParent.")
 end
 
 -- Do all the styling for the child frames
 function DetailsHorizon:StyleChildFrames()
-    console.log("StyleChildFrames()")
     -- First, move all children off-screen incase the
     -- childframe count has been decreased we don't
     -- want old frames sitting around.
@@ -268,7 +262,6 @@ function DetailsHorizon:StyleChildFrames()
         c.text:SetNonSpaceWrap(true)
         c.text:Show()
     end
-    console.log("StyleChildFrames() Styled "..count.." child frames.")
     
     -- Finally, call update to put the data into the child frames.
     DetailsHorizon:Update(DetailsHorizon:GenerateData())
@@ -276,14 +269,13 @@ end
 
 -- Do all the styling of the parent frame
 function DetailsHorizon:StyleParentFrame()
-    console.log("StyleParentFrame()")
     -- Reset any scaling applied to the frame
     frameParent:ClearAllPoints()
 
     frameParent:SetFrameStrata("BACKGROUND")
     
     -- Set width to 100% of screen
-    DetailsHorizon:OnFrameResize()
+    DetailsHorizon:SetFrameParentMaxWidth()
 
     -- Height of frame.
     local h = self.db.profile.background.height
@@ -317,23 +309,12 @@ function DetailsHorizon:StyleParentFrame()
     DetailsHorizon:StyleChildFrames()
 
     DetailsHorizon:Update(DetailsHorizon:GenerateData())
-    
-    console.log("StyleParentFrame() Styled the frameParent.")
-end
-
--- We want to always keep the meter as wide as the screen,
--- so whenever the UI scale changes, we set the width again
-function DetailsHorizon:OnFrameResize()
-    -- Set width of main frame to screen's width.
-    DetailsHorizon:SetFrameParentMaxWidth()
-
-    -- TODO: Resize the entire frame or the scaling will be
-    -- off.
 end
 
 -- Set width of frame to 100%
 function DetailsHorizon:SetFrameParentMaxWidth()
-    frameParent:SetWidth( GetScreenWidth() )
+    frameParent:SetWidth( DetailsHorizon:GetRealScreenWidth() )
+    frameParent:SetScale( DetailsHorizon:Scale(1) )
 end
 
 -- Is the Details addon loaded?
@@ -390,6 +371,11 @@ function DetailsHorizon:Update(data)
         console.log("Error: DetailsHorizon:Update() recieved nil data.")
         return
     end
+
+    -- The ElvUI addon interfers with the ui scale that we're using, so every
+    -- time we update, we need to update the  size of the frame. This is
+    -- costly, so if we can fix this, we should.
+    DetailsHorizon:SetFrameParentMaxWidth()
 
     -- Local variables
     local isRelative = self.db.profile.switches.isRelative
@@ -1496,6 +1482,43 @@ function DetailsHorizon:Loop()
 
     DetailsHorizon:Update(data)
 end -- Loop()
+
+-- Calculate the best scale to use for each screen size so we can have virtual
+-- pixels display as one pixel on the real screen.
+function DetailsHorizon:GetBestScale()
+    local screenWidth, screenHeight = GetPhysicalScreenSize()
+    local bestScale = max(0.4, min(1.15, 768 / screenHeight))
+
+    return bestScale
+end
+
+-- Calculate the real scale of the UI
+function DetailsHorizon:Scale(x)
+    local scale = _G.UIParent:GetEffectiveScale()
+    local screenWidth, screenHeight = GetPhysicalScreenSize()
+    local bestScale = DetailsHorizon:GetBestScale()
+    local pixelScale = 768 / screenHeight
+    local mult = (bestScale / scale) - ((bestScale - pixelScale) / scale)
+
+    return mult * floor(x / mult + 0.5)
+end
+
+-- Returns the size of the window
+-- GetScreenWidth() returns 2100.5 on a 1440p screen @ 0.64 scaling
+function DetailsHorizon:GetRealScreenWidth()
+    local resolution = ({GetScreenResolutions()})[GetCurrentResolution()] or GetCVar('gxWindowedResolution')
+    local w,h = string.match(resolution, "(%d+)x(%d+)")
+    
+    return w
+end
+
+-- We want to always keep the meter as wide as the screen,
+-- so whenever the UI scale changes, we set the width again
+function DetailsHorizon:OnFrameResize()
+    -- Set width of main frame to screen's width.
+    DetailsHorizon:SetFrameParentMaxWidth()
+    DetailsHorizon:StyleParentFrame()
+end
 
 -- ENTRY-POINT
 function DetailsHorizon:OnInitialize()
