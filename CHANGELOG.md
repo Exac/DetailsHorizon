@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2019-06-24
+### Changed
+- The default font is not Arial Narrow, and it is no longer initially incorrect because it's path was being stored instead of teh name of the font.
+### Fixed
+- Bars were not taking up the correct amount of the screen's width after 0.0.4 introduced a bug
+- Details! is now a Required Dependency so new users are not greeted by a blank addon.
+- Changed profile.addribute and profile.subattribute's default value to a number (in case the addon is ever initially loaded without Details!).
+
 ## [0.0.4] - 2019-06-24
 ### Fixed
 - ElvUI changes the global UI scale in an invasive way to get pixel-perfect frames. Added code to prevent ElvUI from resizing the width of DetailsHorison's main background frame.

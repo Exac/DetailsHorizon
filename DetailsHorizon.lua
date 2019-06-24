@@ -25,8 +25,8 @@ local LibSharedMedia = LibStub("LibSharedMedia-3.0")
 -- Database defaults
 local defaults = {
     profile = {
-        attribute = DETAILS_ATTRIBUTE_DAMAGE,
-        subattribute = DETAILS_SUBATTRIBUTE_DPS,
+        attribute = 1,
+        subattribute = 1,
         background = {
             alignment = "BOTTOM", -- TOP | BOTTOM | CENTER
             color = {
@@ -66,12 +66,12 @@ local defaults = {
                     blue = 1.0,
                     alpha = 1.0
                 },
-                innerPadding = 5,
+                innerPadding = 12,
                 size = 16,
-                font = "Fonts\\FRIZQT__.TTF",
+                font = "Arial Narrow",
                 style = "OUTLINE, MONOCHROME", -- "OUTLINE, MONOCHROME"
                 shadow = 1,
-                justifyH = "CENTER", -- CENTER, LEFT, RIGHT
+                justifyH = "LEFT", -- CENTER, LEFT, RIGHT
                 truncate = true,
                 fmt = "%n [%t]" -- %n=name, %t=total, %s=total/time
             },
@@ -311,10 +311,13 @@ function DetailsHorizon:StyleParentFrame()
     DetailsHorizon:Update(DetailsHorizon:GenerateData())
 end
 
--- Set width of frame to 100%
+-- Set width of frame to 100%. Returns the width of the screen.
 function DetailsHorizon:SetFrameParentMaxWidth()
-    frameParent:SetWidth( DetailsHorizon:GetRealScreenWidth() )
+    local w = DetailsHorizon:GetRealScreenWidth()
+    frameParent:SetWidth( w )
     frameParent:SetScale( DetailsHorizon:Scale(1) )
+
+    return w
 end
 
 -- Is the Details addon loaded?
@@ -375,14 +378,13 @@ function DetailsHorizon:Update(data)
     -- The ElvUI addon interfers with the ui scale that we're using, so every
     -- time we update, we need to update the  size of the frame. This is
     -- costly, so if we can fix this, we should.
-    DetailsHorizon:SetFrameParentMaxWidth()
+    local width = DetailsHorizon:SetFrameParentMaxWidth()
 
     -- Local variables
     local isRelative = self.db.profile.switches.isRelative
     local isCustomColor = self.db.profile.bars.isCustomColor
     local isTextUsingClassColor = self.db.profile.switches.isTextUsingClassColor
     local height = self.db.profile.background.height * 1 / UIParent:GetEffectiveScale()
-    local width = GetScreenWidth() -- Width of screen
     local padding = self.db.profile.bars.padding * UIParent:GetEffectiveScale() -- Horizontal padding
     local fmt = self.db.profile.bars.text.fmt
     -- Every child frame

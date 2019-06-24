@@ -1,9 +1,10 @@
 ## Interface: 80100
 ## Title: DetailsHorizon
 ## Notes: Horizontal display of Details data.
-## Version: 0.0.4
+## Version: 0.0.5
 ## Author: Exac
-## OptionalDeps: Ace3, LibSharedMedia-3.0, Details
+## OptionalDeps: Ace3, LibSharedMedia-3.0
+## RequiredDeps: Details
 ## SavedVariables: DetailsHorizonDB
 ## SavedVariablesPerCharacter: DetailsHorizonPerCharDB
 
