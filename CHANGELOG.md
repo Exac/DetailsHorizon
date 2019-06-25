@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.7] - 2019-06-24
+### Added
+- Ability to switch profiles in Menu > Interface > AddOns > DetailsHorizon > Profile.
+
 ## [0.0.6] - 2019-06-24
 ### Fixed
 - Fixed issue with bar height introduced in 0.0.4 where bars were not centered when NOT using ElvUI.

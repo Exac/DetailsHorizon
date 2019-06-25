@@ -1525,11 +1525,6 @@ function DetailsHorizon:OnFrameResize()
     DetailsHorizon:StyleParentFrame()
 end
 
-function DetailsHorizon:StyleIn1Second(a)
-    console.log("Styling in 1 second...")
-    return a
-end
-
 -- ENTRY-POINT
 function DetailsHorizon:OnInitialize()
     -- get config options for Ace3 AceConfig
