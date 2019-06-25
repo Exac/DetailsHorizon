@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2019-06-24
+### Fixed
+- Fixed issue with bar height introduced in 0.0.4 where bars were not centered when NOT using ElvUI.
+
 ## [0.0.5] - 2019-06-24
 ### Changed
 - The default font is not Arial Narrow, and it is no longer initially incorrect because it's path was being stored instead of teh name of the font.
