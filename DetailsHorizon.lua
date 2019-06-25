@@ -192,7 +192,7 @@ function DetailsHorizon:StyleChildFrames()
     local width = self.db.profile.bars.width * 1 / frameParent:GetEffectiveScale()
     
     -- Height of frame (same as parent height)
-    local height = self.db.profile.background.height * 1 / frameParent:GetEffectiveScale()
+    local height = DetailsHorizon:Scale( self.db.profile.background.height )
     
     -- Horizontal padding between bars
     local padding = self.db.profile.bars.padding * 1 / frameParent:GetEffectiveScale()
@@ -278,8 +278,7 @@ function DetailsHorizon:StyleParentFrame()
     DetailsHorizon:SetFrameParentMaxWidth()
 
     -- Height of frame.
-    local h = self.db.profile.background.height
-    local bgHeight = h * 1 / frameParent:GetEffectiveScale()
+    local bgHeight = DetailsHorizon:Scale(self.db.profile.background.height)
     frameParent:SetHeight(bgHeight)
 
     -- Background of frame
@@ -384,7 +383,7 @@ function DetailsHorizon:Update(data)
     local isRelative = self.db.profile.switches.isRelative
     local isCustomColor = self.db.profile.bars.isCustomColor
     local isTextUsingClassColor = self.db.profile.switches.isTextUsingClassColor
-    local height = self.db.profile.background.height * 1 / UIParent:GetEffectiveScale()
+    local height = DetailsHorizon:Scale( self.db.profile.background.height )
     local padding = self.db.profile.bars.padding * UIParent:GetEffectiveScale() -- Horizontal padding
     local fmt = self.db.profile.bars.text.fmt
     -- Every child frame
@@ -421,7 +420,7 @@ function DetailsHorizon:Update(data)
             -- 4. position
             if isRelative then
                 -- Width of the player's bar
-                local relativeWidth = (p[i].total / data.subTotal) * width
+                local relativeWidth = DetailsHorizon:Scale( (p[i].total / data.subTotal) * width )
                 -- Player's bar's offset from left side of parent bar
                 local offsetLeft = ((subSubTotal / data.subTotal) * width) + ((i - 1) * padding)
                 f:SetWidth(relativeWidth - padding)
@@ -1498,7 +1497,7 @@ end
 function DetailsHorizon:Scale(x)
     local scale = _G.UIParent:GetEffectiveScale()
     local screenWidth, screenHeight = GetPhysicalScreenSize()
-    local bestScale = DetailsHorizon:GetBestScale()
+    local bestScale = max(0.4, min(1.15, 768 / screenHeight))
     local pixelScale = 768 / screenHeight
     local mult = (bestScale / scale) - ((bestScale - pixelScale) / scale)
 
