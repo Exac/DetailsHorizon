@@ -9,7 +9,7 @@
 --
 
 -- Create addon using the Ace library.
-DetailsHorizon = LibStub("AceAddon-3.0"):NewAddon("DetailsHorizon", "AceEvent-3.0", "AceTimer-3.0")
+DetailsHorizon = LibStub("AceAddon-3.0"):NewAddon("DetailsHorizon", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
 
 -- Load libraries.
 local Console = LibStub("AceConsole-3.0")
@@ -110,7 +110,11 @@ local console = {
 
 -- Returns true if in verbose mode, else false.
 function DetailsHorizon:IsVerbose()
-    return self.db.profile.switches.isVerbose
+    if not type(self.db)=="nil" then
+        return self.db.profile.switches.isVerbose
+    else
+        return true
+    end
 end
 
 -- Only create the UI Elements for child frames. This
@@ -1527,12 +1531,26 @@ function DetailsHorizon:OnInitialize()
     local configOptions = DetailsHorizon:GetConfigOptions()
     
     AceConfig:RegisterOptionsTable("DetailsHorizon", configOptions, {"detailshorizon", "detailsh"})
-    
+
     -- Create a new database object using the default table, and add it to
     -- the game's Interface > AddOns menu.
     self.defaults = defaults
     self.db = AceDB:New("DetailsHorizonDB", self.defaults, true);
-    self.profilesFrame = AceConfigDialog:AddToBlizOptions("DetailsHorizon", "DetailsHorizon");
+
+    -- Create an AceDBOptions premade profile page.
+    local profileOptions = AceDBOptions:GetOptionsTable(self.db)
+    
+    -- Every time the premade profile page changes the current profile, we need
+    -- to  refresh our UI, so we call StyleParentFrame() on a short 1s timer.
+    self:Hook(profileOptions.handler, "CopyProfile", function () self:ScheduleTimer("StyleParentFrame", 0.1) end)
+    self:Hook(profileOptions.handler, "DeleteProfile", function () self:ScheduleTimer("StyleParentFrame", 0.1) end)
+    self:Hook(profileOptions.handler, "SetProfile", function () self:ScheduleTimer("StyleParentFrame", 0.1) end)
+    self:Hook(profileOptions.handler, "HasNoProfiles", function () self:ScheduleTimer("StyleParentFrame", 0.1) end)
+    
+    -- Add the premade AceDBOptions profile page to teh optiosn
+    configOptions.args.profile = profileOptions
+
+    self.profilesFrame = AceConfigDialog:AddToBlizOptions("DetailsHorizon", ConfigTableChange);
 
     console.log("OnInitialize()")
 
