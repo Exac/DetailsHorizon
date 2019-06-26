@@ -360,7 +360,13 @@ function DetailsHorizon:FormatLabel(fmt, unitname, total, tempo)
     if type(fmt)=="string" then result = fmt else result = "" end
     if unitName == nil then unitName = "" end
     if total == nil then total = 0 end
-    if tempo == nil or temp == infT then tempo = 0 end
+    if tempo == nil then
+        tempo = 0
+        console.log("Tempo for "..unitName.." was nil, number expected.")
+    elseif tempo == infT then
+        tempo = 0
+        console.log("Tempo for "..unitName.." was infT, number expected.")
+    end
 
     -- Replace unit
     result = string.gsub(result, "%%n", unitname)
@@ -398,8 +404,10 @@ function DetailsHorizon:Update(data)
     for i, f in ipairs(frameParent.children) do
         if type(p[i]) == "table" then -- Put player's data into frame...
             -- 1. text value
-            f.text:SetText(DetailsHorizon:FormatLabel(fmt, p[i].name, DetailsHorizon:FormatNumber(p[i].total), DetailsHorizon:FormatNumber(p[i].total / p[i].tempo)))
-            -- f.text:SetText(p[i].name .. " [" .. DetailsHorizon:FormatNumber(p[i].total) .. "]")
+            local seconds = p[i].tempo
+            if seconds <= 0 or seconds == infT then seconds = 1 end
+            local tmpo = p[i].total / seconds
+            f.text:SetText(DetailsHorizon:FormatLabel(fmt, p[i].name, DetailsHorizon:FormatNumber(p[i].total), DetailsHorizon:FormatNumber(tmpo)))
             -- Note: The longest possible label is "Wmmmmmmmmmmmm [222.2M]"
             -- 2. text color
             if isTextUsingClassColor then
@@ -496,7 +504,10 @@ function DetailsHorizon:GenerateData()
     data.players = {}
 
     -- Exit early if Details addon not enabled
-    if not DetailsHorizon:IsDetailsEnabled() then return data end
+    if not DetailsHorizon:IsDetailsEnabled() then
+        console.log("Details is not enabled, so we were unable to fetch data.")
+        return data
+    end
 
     -- Load details API, and sort the actors
     local details = _G.Details
@@ -526,10 +537,11 @@ function DetailsHorizon:GenerateData()
                 console.log("Actor did not have a total, this is indicitive data that isn't parsable right now.")
                 player.total = 0
             end
-            if type(actor.Tempo)=="number" then
+            local tempo = actor:Tempo()
+            if type(tempo)=="number" then
                 player.tempo = actor:Tempo() 
             else 
-                -- console.log("Actor did not have a Tempo, this is indicitive data that isn't parsable right now.")
+                console.log("actor:Tempo() did not produce an expected number, setting tempo to 0.")
                 player.tempo = 0
             end
             player.color = {}
@@ -539,6 +551,9 @@ function DetailsHorizon:GenerateData()
             player.color.bar.r, player.color.bar.g, player.color.bar.b = actor:GetBarColor()
             data.players[i] = player
             data.subTotal = data.subTotal + player.total
+
+            console.log("actor name="..player.name.." total="..player.total.." tempo="..player.tempo)
+
             i = i + 1 -- increment index
         end
     end -- for in actorContainer

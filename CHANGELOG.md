@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.8] - 2019-06-25
+### Fixed
+- Fixed bug where total over time was displaying as zero
+- Game is now combatible with patch 8.2
+
 ## [0.0.7] - 2019-06-24
 ### Added
 - Ability to switch profiles in Menu > Interface > AddOns > DetailsHorizon > Profile.
