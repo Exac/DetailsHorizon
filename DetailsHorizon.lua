@@ -316,9 +316,8 @@ end
 
 -- Set width of frame to 100%. Returns the width of the screen.
 function DetailsHorizon:SetFrameParentMaxWidth()
-    local w = DetailsHorizon:GetRealScreenWidth()
+    local w = GetScreenWidth()
     frameParent:SetWidth( w )
-    frameParent:SetScale( DetailsHorizon:Scale(1) )
 
     return w
 end
@@ -465,7 +464,7 @@ end -- Update()
 
 -- Generate data variable in the following shape:
 -- {
---     attribute: Number Enum, -- DETAILS_ATTRIBUTE_DAMAGE or DETAILS_ATTRIBUTE_HEAL
+--     attribute: Number Enum, -- DETAILS_ATTRIBUTE_<DAMAGE|HEAL>
 --     grandTotal: Number, -- Group's total damage/healing
 --     subTotal: Number, -- Displayed group member's total damage/healing
 --     players {
@@ -551,8 +550,6 @@ function DetailsHorizon:GenerateData()
             player.color.bar.r, player.color.bar.g, player.color.bar.b = actor:GetBarColor()
             data.players[i] = player
             data.subTotal = data.subTotal + player.total
-
-            console.log("actor name="..player.name.." total="..player.total.." tempo="..player.tempo)
 
             i = i + 1 -- increment index
         end
@@ -836,7 +833,8 @@ function DetailsHorizon:GetConfigOptions()
                             for i, v in ipairs(LibSharedMedia:List("statusbar")) do
                                 if tName == v then return i end
                             end
-                            return 0 -- Failed to find an index for the stored name
+                            return 0 -- Failed to find an index for the stored
+                                     -- name.
                         end,
                     },
                     widthHeader = {
@@ -985,7 +983,8 @@ function DetailsHorizon:GetConfigOptions()
                                     return i
                                 end
                             end
-                            return 0 -- Failed to find an index for the stored name
+                            return 0 -- Failed to find an index for the stored
+                                     -- name.
                         end,
                     },
                     labelFontStyle = {
@@ -1204,7 +1203,8 @@ function DetailsHorizon:GetConfigOptions()
                                     return i
                                 end
                             end
-                            return 0 -- Failed to find an index for the stored name
+                            return 0 -- Failed to find an index for the stored
+                                     -- name
                         end,
                     },
                     height = {
@@ -1562,7 +1562,7 @@ function DetailsHorizon:OnInitialize()
     self:Hook(profileOptions.handler, "SetProfile", function () self:ScheduleTimer("StyleParentFrame", 0.1) end)
     self:Hook(profileOptions.handler, "HasNoProfiles", function () self:ScheduleTimer("StyleParentFrame", 0.1) end)
     
-    -- Add the premade AceDBOptions profile page to teh optiosn
+    -- Add the premade AceDBOptions profile page to the options.
     configOptions.args.profile = profileOptions
 
     self.profilesFrame = AceConfigDialog:AddToBlizOptions("DetailsHorizon", ConfigTableChange);
@@ -1572,13 +1572,21 @@ function DetailsHorizon:OnInitialize()
     -- Registered custom media included with this addon.
     LibSharedMedia:Register("font", "Fira Mono Medium", "Interface\\AddOns\\DetailsHorizon\\Media\\Fonts\\FiraMono-Medium.ttf", LibSharedMedia.LOCALE_BIT_western + LibSharedMedia.LOCALE_BIT_ruRU)
 
-    -- Create the parent frame only once. This has the side-effect of creating
-    -- the child-frames too. Style the parent & child frames next.
-    DetailsHorizon:SetupParentFrame();
-    DetailsHorizon:StyleParentFrame();
-    DetailsHorizon:StyleChildFrames();
+    -- Wait until the ui-scale has been set, they create our frames. After
+    -- frames are created, style and begin our main loop. 
+    self:ScheduleTimer("BeginLoopAndStyleFrames", 2)
 
-    -- Initialize the main loop that will call Details! and update the
-    -- horizontal display.
-    self.testTimer = self:ScheduleRepeatingTimer("Loop", 1)
 end -- OnInitialize()
+
+-- Style frames and begin our loop
+function DetailsHorizon:BeginLoopAndStyleFrames()
+    -- Create frames.
+    DetailsHorizon:SetupParentFrame()
+    
+    -- Style all the created frames.
+    DetailsHorizon:StyleParentFrame()
+    
+    -- Initialize the main loop that will use Details!'s API to update the
+    -- meter.
+    self.loopTimer = self:ScheduleRepeatingTimer("Loop", 1)
+end
