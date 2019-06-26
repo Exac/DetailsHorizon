@@ -1,10 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.9] - 2019-06-25
+### Fixed
+- Fixed a bug where the width of the main bar was not expanding to the edge of the screen because other addons were changing the UI Scale on initialization.
+- Fixed various code formatting issues.
+
 ## [0.0.8] - 2019-06-25
 ### Fixed
 - Fixed bug where total over time was displaying as zero
-- Game is now combatible with patch 8.2
+- AddOn is now combatible with patch 8.2
 
 ## [0.0.7] - 2019-06-24
 ### Added
