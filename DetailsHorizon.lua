@@ -178,10 +178,13 @@ end
 
 -- Do all the styling for the child frames
 function DetailsHorizon:StyleChildFrames()
-    -- First, move all children off-screen incase the
+    -- First, move all children off-screen in case the
     -- childframe count has been decreased we don't
     -- want old frames sitting around.
     for _, c in ipairs(frameParent.children) do
+        -- Break out of for loop if child is nil
+        if type( c ) == "nil" then break end
+
         c:ClearAllPoints()
         c:SetWidth(0)
         c:SetHeight(0)

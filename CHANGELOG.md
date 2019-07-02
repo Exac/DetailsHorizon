@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.10] - 2019-07-02
+### Changed
+- Add checks to the code to make sure the frames have been created before using them.
+
 ## [0.0.9] - 2019-06-25
 ### Fixed
 - Fixed a bug where the width of the main bar was not expanding to the edge of the screen because other addons were changing the UI Scale on initialization.
