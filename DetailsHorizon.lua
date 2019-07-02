@@ -206,6 +206,9 @@ function DetailsHorizon:StyleChildFrames()
 
     -- Loop through each bar and build it
     for i,c in ipairs(frameParent.children) do -- i=index, c = child frame
+        -- Don't try and use nil frames
+        if c == nil then break end
+
         -- Don't consider extra frames
         if i > count then return end
         
@@ -276,6 +279,12 @@ end
 
 -- Do all the styling of the parent frame
 function DetailsHorizon:StyleParentFrame()
+    -- Don't do anything if the frame parent is nil
+    if frameParent == nil then
+        console.log("Warning: Could not style parent frame because it doesn't exist.")
+        return
+    end
+
     -- Reset any scaling applied to the frame
     frameParent:ClearAllPoints()
 
