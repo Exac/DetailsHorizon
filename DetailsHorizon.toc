@@ -1,7 +1,7 @@
 ## Interface: 80200
 ## Title: DetailsHorizon
 ## Notes: Horizontal display of Details data.
-## Version: 0.0.9
+## Version: 0.0.10
 ## Author: Exac
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 ## RequiredDeps: Details
