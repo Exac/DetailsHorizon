@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.11] - 2019-07-02
+### Added
+- Add option to disable the addon
+- Add console.logAlways to log regardless of the user's logging settings
+- Add message to tell user if the addon is disabled.
+
 ## [0.0.10] - 2019-07-02
 ### Changed
 - Add checks to the code to make sure the frames have been created before using them.

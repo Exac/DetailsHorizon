@@ -81,6 +81,7 @@ local defaults = {
             isTextUsingClassColor = true,
             isVerbose = false,
             isShowPlayerRealmName = false,
+            isEnabled = true,
         },
         presets = {
             selected = "avalance"
@@ -96,15 +97,26 @@ local frameParent = CreateFrame("Frame", nil, UIParent)
 
 -- Familiar console logging function
 local console = {
+    -- Only log if in verbose mode
     log = function (argument)
-        -- Only log if in verbose mode
         if DetailsHorizon:IsVerbose() then
-            if argument == nil then argument = "nil" end
+            if argument == nil then
+                argument = "nil"
+            end
             if type(argument)=="boolean" then
                 if argument then argument = "true" else argument = "false" end
             end
-            Console:Print(ChatFrame1, "|cFFFFFF00[DetailsHorizon]: "..argument);
+            Console:Print(ChatFrame1, "|cFFFFFF00[DetailsHorizon]: "..argument)
         end
+    end,
+    logAlways = function (argument)
+        if argument == nil then
+            argument = "nil"
+        end
+        if type(argument)=="boolean" then
+            if argument then argument = "true" else argument = "false" end
+        end
+        Console:Print(ChatFrame1, "|cFFFFFF00[DetailsHorizon]: "..argument)
     end
 }
 
@@ -388,7 +400,15 @@ function DetailsHorizon:FormatLabel(fmt, unitname, total, tempo)
 end
 
 -- Display dps visually on the screen horizontally
-function DetailsHorizon:Update(data)    
+function DetailsHorizon:Update(data)
+    -- Hide addon if disabled -- TODO: MAYBE DO THIS IN ONENABLE & ONDISABLE
+    if not self.db.profile.switches.isEnabled then
+        frameParent:Hide()
+        return
+    else
+        frameParent:Show()
+    end
+
     -- Validate data
     if data == nil then 
         console.log("Error: DetailsHorizon:Update() recieved nil data.")
@@ -735,15 +755,36 @@ function DetailsHorizon:GetConfigOptions()
                             return value
                         end,
                     },
-                    developmentHeader = {
+                    enableSettings = {
                         order = 60,
+                        name = "On / Off Settings",
+                        type = "header"
+                    },
+                    isEnabled = {
+                        name = "Enable DetailsHorizon",
+                        desc = "Show the AddOn?",
+                        order = 61,
+                        type = "toggle",
+                        get = function (value)
+                            return self.db.profile.switches.isEnabled
+                        end,
+                        set = function (info, value)
+                            if value then
+                                DetailsHorizon:OnEnable()
+                            else
+                                DetailsHorizon:OnDisable()
+                            end
+                        end,
+                    },
+                    developmentHeader = {
+                        order = 70,
                         name = "Developer Settings",
                         type = "header"
                     },
                     isVerbose = {
                         name = "Verbose logging mode",
                         desc = "This is for development. \nIf you enable this you will see messages in your chat from this addon.",
-                        order = 61,
+                        order = 71,
                         type = "toggle",
                         get = function (value)
                             return self.db.profile.switches.isVerbose
@@ -1552,6 +1593,19 @@ function DetailsHorizon:OnFrameResize()
     DetailsHorizon:StyleParentFrame()
 end
 
+function DetailsHorizon:OnEnable()
+    console.log("ONENABLE")
+    self.db.profile.switches.isEnabled = true
+    frameParent:Show()
+end
+
+function DetailsHorizon:OnDisable()
+    self.db.profile.switches.isEnabled = false
+    frameParent:Show()
+    console.log("ONDISABLE")
+end
+
+
 -- ENTRY-POINT
 function DetailsHorizon:OnInitialize()
     -- get config options for Ace3 AceConfig
@@ -1580,6 +1634,10 @@ function DetailsHorizon:OnInitialize()
     self.profilesFrame = AceConfigDialog:AddToBlizOptions("DetailsHorizon", ConfigTableChange);
 
     console.log("OnInitialize()")
+
+    if not self.db.profile.switches.isEnabled then
+        console.logAlways("DetaislHorizon is disabled. You may enable it in your AddOn settings.")
+    end
 
     -- Registered custom media included with this addon.
     LibSharedMedia:Register("font", "Fira Mono Medium", "Interface\\AddOns\\DetailsHorizon\\Media\\Fonts\\FiraMono-Medium.ttf", LibSharedMedia.LOCALE_BIT_western + LibSharedMedia.LOCALE_BIT_ruRU)
